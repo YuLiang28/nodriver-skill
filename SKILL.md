@@ -7,6 +7,17 @@ description: >-
   using Python's nodriver library (no Selenium or WebDriver binaries required). Use this skill whenever
   the user wants to use nodriver, scrape dynamic SPAs, reuse authenticated browser sessions, capture XHR/Fetch
   API responses, or build custom async browser automation workflows.
+license: MIT
+homepage: https://github.com/YuLiang28/nodriver-skill
+tags:
+  - nodriver
+  - browser-automation
+  - web-scraping
+  - chrome-devtools-protocol
+  - cdp
+  - chromium
+  - python
+  - agent-skills
 ---
 
 # Nodriver Browser Automation & Web Extraction Skill
