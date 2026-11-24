@@ -196,3 +196,22 @@ await chart.flash(duration=0.5)
 await chart.highlight_overlay()
 await tab.open_external_inspector()  # Opens DevTools frontend without dropping connection
 ```
+
+---
+
+## 7. Cloudflare Challenge Checkbox (`verify_cf`)
+
+```python
+# Click the "Verify you are human" checkbox of a Cloudflare challenge page
+await tab.verify_cf()                               # returns None
+await tab.verify_cf(template_image="cf_zh.png")     # custom template, click target centered
+await tab.verify_cf(flash=True)                     # show where it clicks (headed mode)
+
+# Lower-level: locate the checkbox yourself
+x, y = await tab.template_location()                # (x, y), or None
+```
+
+- `verify_cf()` matches a built-in image of the English checkbox against a viewport screenshot and clicks its center. It needs `opencv-python`, raises in `expert` mode, and only matches at 100% zoom / display scale (use `template_image` for other languages or appearances).
+- It returns `None` and has no threshold: it clicks the best match even when nothing resembles the checkbox. Call it only once the tab is on a challenge page, then re-read the page to see whether it cleared.
+- It writes temporary `screen.jpg` / `cf_template.png` files into the current working directory (removed afterwards).
+- Passing the challenge is not guaranteed. Keep `session_manager.py` in headed mode as the fallback.

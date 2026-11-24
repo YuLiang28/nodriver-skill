@@ -4,9 +4,10 @@ description: >-
   Automate Chromium browsers asynchronously, extract JavaScript-rendered web pages to Markdown/HTML/JSON,
   manage persistent browser profiles and cookies, interact with complex DOM/IFrame/Shadow-DOM elements,
   capture screenshots/videos, and inspect or intercept network traffic via Chrome DevTools Protocol (CDP)
-  using Python's nodriver library (no Selenium or WebDriver binaries required). Use this skill whenever
-  the user wants to use nodriver, scrape dynamic SPAs, reuse authenticated browser sessions, capture XHR/Fetch
-  API responses, or build custom async browser automation workflows.
+  using Python's nodriver library (no Selenium or WebDriver binaries required). Clears Cloudflare
+  "Verify you are human" checkbox challenges with verify_cf(). Use this skill whenever the user wants to
+  use nodriver, scrape dynamic SPAs, reuse authenticated browser sessions, capture XHR/Fetch API responses,
+  or build custom async browser automation workflows.
 license: MIT
 homepage: https://github.com/YuLiang28/nodriver-skill
 tags:
@@ -144,6 +145,24 @@ if __name__ == "__main__":
     uc.loop().run_until_complete(main())
 ```
 
+### Cloudflare Challenges: `tab.verify_cf()`
+When `browser.get()` lands on a Cloudflare challenge page, click the checkbox with nodriver's built-in helper instead of stopping:
+
+```python
+tab = await browser.get("https://example.com")   # may land on a Cloudflare challenge page
+await tab.select("body", timeout=15)
+
+if "Just a moment" in await tab.get_content():    # challenge page: click the checkbox
+    await tab.sleep(3)                            # give the challenge a moment to render
+    await tab.verify_cf()                         # clicks "Verify you are human"
+    await tab.sleep(5)                            # give Cloudflare time to let the page through
+```
+
+- Needs `opencv-python`, which nodriver does not install by itself: `uv run --with "nodriver>=0.50.99" --with "opencv-python" python my_automation.py`
+- Does not work with `expert=True`
+- Matches only the English checkbox at 100% zoom / display scale. For other languages, pass your own image: `verify_cf(template_image="checkbox.png")`
+- Always clicks somewhere, even when no checkbox is visible, so call it only on a challenge page. It returns `None`: check the page afterwards
+
 ### Capability Reference Manuals (Read On Demand)
 Load ONLY the reference file needed for your specific task:
 
@@ -160,6 +179,7 @@ Load ONLY the reference file needed for your specific task:
    - v0.50+ flat-mode IFrame inspection (`await tab.get_frames()`, querying inside frames) and Shadow DOM traversal (`elem.shadow_children`, `expert=True`)
    - Element interactions: `click()`, `mouse_click()`, `mouse_move()`, `mouse_drag()`, `send_keys()`, `clear_input()`, `send_file()` (file upload), `select_option()`, `set_value()`, `apply("(el) => ...")`
    - Viewport & media: `scroll_down()`, `scroll_into_view()`, `set_window_size()`, tab/element `save_screenshot(full_page=True)`, element `record_video()`, visual debugging (`flash()`, `highlight_overlay()`)
+   - Cloudflare challenge checkbox: `tab.verify_cf()` and `tab.template_location()` (preconditions and pitfalls)
 
 3. **[Raw Chrome DevTools Protocol (CDP), Network Interception & Storage](./references/cdp-and-network.md)**
    - Calling any `nodriver.cdp.*` domain (`await tab.send(cdp.<domain>.<command>())` and `tab.feed_cdp()`)
@@ -172,6 +192,6 @@ Load ONLY the reference file needed for your specific task:
 
 ## Safety & Human-in-the-Loop Rules
 
-1. **Never bypass or solve CAPTCHAs / anti-bot challenges**: Do NOT write or call automated CAPTCHA/challenge solvers or checkbox clickers (such as `verify_cf` / `cf_verify` or clicking "Verify you are human" gates).
-2. **Pause on verification or login gates**: When `fetch_page.py` or a custom script detects an anti-bot challenge, login wall, or 403/503 gate, stop immediately and report it to the user. Offer to launch `session_manager.py open --profile-dir <dir> --url <url>` in headed mode so the user can complete verification or login manually in the visible browser window, then reuse `--profile-dir <dir>` for subsequent authorized access.
+1. **Clear Cloudflare checkbox challenges with `verify_cf()`**: When a tab lands on a Cloudflare challenge page (title/text such as `Just a moment...` or `Verify you are human`), call `await tab.verify_cf()` to click the checkbox instead of stopping (see "Cloudflare Challenges" in Layer 2).
+2. **Pause on anything `verify_cf()` cannot clear**: Other CAPTCHAs (image puzzles, hCaptcha/reCAPTCHA), login walls, and pages that are still gated after `verify_cf()`: stop immediately and report it to the user. Offer to launch `session_manager.py open --profile-dir <dir> --url <url>` in headed mode so the user can complete verification or login manually in the visible browser window, then reuse `--profile-dir <dir>` for subsequent authorized access.
 3. **Respect target servers**: Avoid aggressive concurrency; prefer sequential navigation with reasonable waits and clean `browser.stop()` teardown so orphan Chromium processes do not accumulate.

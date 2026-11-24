@@ -146,8 +146,9 @@ async def run_fetch(args: argparse.Namespace) -> int:
             sys.stderr.write(
                 f"[GATE_DETECTED] Target page appears gated by an anti-bot or access challenge "
                 f"(matched: {gate_match!r}).\n"
-                f"Do NOT attempt automated bypass. Run session_manager.py in headed mode with "
-                f"--profile-dir so the user can complete verification manually.\n"
+                f"To clear a Cloudflare checkbox challenge, call tab.verify_cf() in a custom "
+                f"script (see SKILL.md). For anything else, run session_manager.py in headed "
+                f"mode with --profile-dir so the user can complete verification manually.\n"
             )
 
         if args.screenshot:

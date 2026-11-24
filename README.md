@@ -54,7 +54,7 @@ npx skills add YuLiang28/nodriver-skill --global
 | | `scripts/session_manager.py` | Human-in-the-Loop headed profile session (`user_data_dir`) for manual login, `CookieJar` export/import/inspect.<br>人机协同有头持久化会话管理、人工登录固化、Cookie 导出与查看。 |
 | | `scripts/network_capture.py` | CDP `RequestWillBeSent` & `ResponseReceived` sniffer saving XHR/Fetch JSON/text payloads to `.jsonl`.<br>原生 CDP 接口抓包，自动过滤并落盘后台 XHR/Fetch 响应体。 |
 | **References**<br>全量原生能力手册 | `references/browser-and-config.md` | `Config`, `start()`, remote debug port attach (`host:port`), extensions (`add_extension`), `expert` mode, `create_context` + authenticated `ProxyForwarder`, `CookieJar`, multi-window `tile_windows()`. |
-| | `references/tab-and-dom.md` | `find(best_match=True)`, `select_all(include_frames=True)`, `xpath()`, v0.50+ flat-mode `get_frames()`, Shadow DOM, mouse/keyboard/drag, `send_file()` upload, `save_screenshot()`, `record_video()`. |
+| | `references/tab-and-dom.md` | `find(best_match=True)`, `select_all(include_frames=True)`, `xpath()`, v0.50+ flat-mode `get_frames()`, Shadow DOM, mouse/keyboard/drag, `send_file()` upload, `save_screenshot()`, `record_video()`, `verify_cf()`. |
 | | `references/cdp-and-network.md` | Direct `nodriver.cdp.*` commands, `add_handler()`, `cdp.fetch.RequestPaused` request interception/modification, `evaluate()` / `js_dumps()`, `localStorage`, controlled downloads. |
 
 ---
@@ -82,9 +82,9 @@ nodriver-skill/
 
 ## Compliance & Responsible Use / 合规使用说明
 
-This skill is designed for legitimate browser automation, testing, and authorized web content extraction. Automated CAPTCHA solving or anti-bot challenge bypassing is intentionally excluded; when interacting with sites requiring login or human verification, use `session_manager.py` in headed mode with a persistent `--profile-dir` to complete authentication manually.
+This skill is designed for legitimate browser automation, testing, and authorized web content extraction. It automates the one challenge nodriver supports out of the box, clicking the Cloudflare "Verify you are human" checkbox (`tab.verify_cf()`); other CAPTCHAs are not handled. When a challenge cannot be cleared or a site requires login, use `session_manager.py` in headed mode with a persistent `--profile-dir` to complete authentication manually.
 
-本 Skill 面向合法的浏览器自动化测试与授权数据采集设计，不包含自动破解或绕过验证码/反爬质询的逻辑；访问需要登录或真人验证的站点时，请使用 `session_manager.py` 打开有头持久化 Profile 手动完成认证后复用会话。
+本 Skill 面向合法的浏览器自动化测试与授权数据采集设计，仅自动处理 nodriver 原生支持的一种挑战——点击 Cloudflare 的“确认您是真人”复选框（`tab.verify_cf()`），不处理其他验证码；挑战无法通过或站点需要登录时，请使用 `session_manager.py` 打开有头持久化 Profile 手动完成认证后复用会话。
 
 ## License
 
