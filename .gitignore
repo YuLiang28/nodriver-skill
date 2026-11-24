@@ -1,0 +1,31 @@
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Python cache & build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Browser profiles, cookies, and temporary outputs
+.browser_profiles/
+profiles/
+*.session.dat
+*.cookies.pkl
+output/
+captures/
+*.jpg
+*.jpeg
+*.png
+*.mp4
+*.webm
+
+# OS & Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
